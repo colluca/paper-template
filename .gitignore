@@ -1,0 +1,4 @@
+/build
+/fig/*.pdf
+/res
+!/res/.gitignore
