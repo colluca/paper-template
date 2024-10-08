@@ -29,8 +29,9 @@ PDFLATEX_FLAGS = -shell-escape
 # Internal variables #
 ######################
 
-PAPER_PDF      = $(BUILDDIR)/$(PAPER).pdf
-PAPER_DIFF_PDF = $(BUILDDIR)/$(PAPER).diff.pdf
+PAPER_PDF       = $(BUILDDIR)/$(PAPER).pdf
+BLIND_PAPER_PDF = $(BUILDDIR)/$(PAPER)-blind.pdf
+PAPER_DIFF_PDF  = $(BUILDDIR)/$(PAPER).diff.pdf
 
 DOC_PDFS = $(addprefix $(BUILDDIR)/,$(addsuffix .pdf,$(DOCS)))
 
@@ -63,13 +64,14 @@ $(BUILDDIR)/$(1).pdf: $(SRCDIR)/$(1).tex | $(BUILDDIR)
 	$(call CLEANUP_LATEX_ARTIFACTS,$(BUILDDIR)/$(1))
 endef
 
-# Rule template for building complex Latex documents (i.e. with bibliography)
+# Rule template for building complex LaTeX documents (i.e. with bibliography)
 define BUILD_LATEX_COMPLEX
-$(BUILDDIR)/$(2).pdf: $(1)/$(2).tex $(3) | $(BUILDDIR)
-	$(PDFLATEX) $(PDFLATEX_FLAGS) -output-directory $(BUILDDIR) $(1)/$(2)
-	$(BIBTEX) $(BUILDDIR)/$(2)
-	$(PDFLATEX) $(PDFLATEX_FLAGS) -output-directory $(BUILDDIR) $(1)/$(2)
-	$(PDFLATEX) $(PDFLATEX_FLAGS) -output-directory $(BUILDDIR) $(1)/$(2)
+$(BUILDDIR)/$(3).pdf: $(1)/$(2).tex $(4) | $(BUILDDIR)
+	$(eval VARDEFS := $(foreach var,$(5),\\def\\$(var){} ))
+	$(PDFLATEX) $(PDFLATEX_FLAGS) -jobname $(3) -output-directory $(BUILDDIR) $(VARDEFS) "\input{$(1)/$(2)}"
+	$(BIBTEX) $(BUILDDIR)/$(3)
+	$(PDFLATEX) $(PDFLATEX_FLAGS) -jobname $(3) -output-directory $(BUILDDIR) $(VARDEFS) "\input{$(1)/$(2)}"
+	$(PDFLATEX) $(PDFLATEX_FLAGS) -jobname $(3) -output-directory $(BUILDDIR) $(VARDEFS) "\input{$(1)/$(2)}"
 endef
 
 #########
@@ -85,6 +87,8 @@ paper: $(PAPER_PDF)
 docs: $(DOC_PDFS)
 
 diff: $(DIFF_PDF)
+
+blind: $(BLIND_PAPER_PDF)
 
 results: $(RESULTS)
 
@@ -103,10 +107,13 @@ $(BUILDDIR)/$(DIFF).tex: $(SRCDIR)/$(PAPER).tex
 	mv $(SRCDIR)/$(DIFF).tex $(BUILDDIR)
 
 # Generate rule for paper
-$(eval $(call BUILD_LATEX_COMPLEX,$(SRCDIR),$(PAPER),$(PAPER_PREREQUISITES)))
+$(eval $(call BUILD_LATEX_COMPLEX,$(SRCDIR),$(PAPER),$(PAPER),$(PAPER_PREREQUISITES)))
 
 # Generate rule for diff
-$(eval $(call BUILD_LATEX_COMPLEX,$(BUILDDIR),$(DIFF),$(PAPER_PREREQUISITES)))
+$(eval $(call BUILD_LATEX_COMPLEX,$(BUILDDIR),$(DIFF),$(DIFF),$(PAPER_PREREQUISITES)))
+
+# Generate rule for blind paper
+$(eval $(call BUILD_LATEX_COMPLEX,$(SRCDIR),$(PAPER),$(PAPER)-blind,$(PAPER_PREREQUISITES),blindreview))
 
 # Generate rules for all docs
 $(foreach doc,$(DOCS),$(eval $(call BUILD_LATEX_SIMPLE,$(doc))))
