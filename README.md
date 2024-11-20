@@ -26,7 +26,7 @@ Store figures in the `fig` directory. Any `.svg` files in this directory will be
 
 ### Auto-generate results
 
-If you have any auto-generated results, open `Makefile` and point the `RESULTS_SCRIPT` variable to the result-generating script. Make sure the results are generated in the `res` folder, and list all results the paper depends on in the `RESULTS` variable.
+If you have any auto-generated results, open `Makefile` and add the rules to generate the results in the relevant section at the bottom of the file. Make sure the results are generated in the `res` folder, and list all results the paper depends on in the `RESULTS` variable.
 
 ### Import auxiliary documents
 
@@ -48,3 +48,5 @@ Once configured, the repository provides the following Make targets:
 |`all`                      |Invoke all of the above.|
 |`diff REV1=HEAD^ REV2=HEAD`|To generate a diff of the paper between the specified revisions. If omitted, the `REV*` variables default to the mentioned values.|
 |`blind`                    |Build an obfuscated version of the paper for double-blind review. The `blindreview` variable implicitly defined by this command can be used within the paper source to conditionally obfuscate content.|
+|`clean-paper`              |Deletes all artifacts of the `paper` and `diff` targets.|
+|`clean`                    |Deletes all artifacts.|

@@ -13,7 +13,6 @@ GLOSSARY = $(SRCDIR)/glossary.tex
 BIBLIO   = $(SRCDIR)/$(PAPER).bib
 
 RESULTS        =
-RESULTS_SCRIPT =
 
 PAPER_FIGS          = $(patsubst %.svg,%.pdf,$(wildcard fig/*.svg))
 PAPER_PREREQUISITES = $(PAPER_FIGS) $(CLS) $(BST) $(RESULTS) $(GLOSSARY) $(BIBLIO)
@@ -78,7 +77,7 @@ endef
 # Rules #
 #########
 
-.PHONY: all paper docs diff results clean
+.PHONY: all paper docs diff results clean clean-paper
 
 all: results paper docs
 
@@ -94,9 +93,6 @@ results: $(RESULTS)
 
 $(RESDIR):
 	mkdir -p $@
-
-$(RESULTS): $(RESULTS_SCRIPT) | $(RESDIR)
-	$<
 
 $(BUILDDIR):
 	mkdir -p $@
@@ -122,6 +118,13 @@ $(foreach doc,$(DOCS),$(eval $(call BUILD_LATEX_SIMPLE,$(doc))))
 %.pdf: %.svg
 	inkscape $< --export-pdf=$@
 
-clean:
+clean-paper:
 	rm -rf $(BUILDDIR)
 	$(call CLEANUP_LATEX_ARTIFACTS,*)
+
+clean: clean-paper
+	rm -rf $(RESULTS) $(PAPER_FIGS)
+
+###########
+# Results #
+###########
