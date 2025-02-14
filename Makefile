@@ -12,7 +12,7 @@ DOCS     =
 GLOSSARY = $(SRCDIR)/glossary.tex
 BIBLIO   = $(SRCDIR)/$(PAPER).bib
 
-RESULTS        =
+RESULTS =
 
 PAPER_FIGS          = $(patsubst %.svg,%.pdf,$(wildcard fig/*.svg))
 PAPER_PREREQUISITES = $(PAPER_FIGS) $(CLS) $(BST) $(RESULTS) $(GLOSSARY) $(BIBLIO)
@@ -127,8 +127,8 @@ clean-paper:
 clean-fig:
 	rm -f $(PAPER_FIGS)
 
-clean: clean-paper
-	rm -rf $(RESULTS) $(PAPER_FIGS)
+clean: clean-fig clean-paper
+	rm -rf $(RESULTS)
 
 ###########
 # Results #
