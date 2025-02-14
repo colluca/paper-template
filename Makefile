@@ -77,9 +77,11 @@ endef
 # Rules #
 #########
 
-.PHONY: all paper docs diff results clean clean-paper
+.PHONY: all fig paper docs diff results clean clean-fig clean-paper
 
 all: results paper docs
+
+fig: $(PAPER_FIGS)
 
 paper: $(PAPER_PDF)
 
@@ -121,6 +123,9 @@ $(foreach doc,$(DOCS),$(eval $(call BUILD_LATEX_SIMPLE,$(doc))))
 clean-paper:
 	rm -rf $(BUILDDIR)
 	$(call CLEANUP_LATEX_ARTIFACTS,*)
+
+clean-fig:
+	rm -f $(PAPER_FIGS)
 
 clean: clean-paper
 	rm -rf $(RESULTS) $(PAPER_FIGS)

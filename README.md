@@ -43,10 +43,12 @@ Once configured, the repository provides the following Make targets:
 |Target                     |Description|
 |---------------------------|-----------|
 |`results`                  |Regenerate results.|
+|`fig`                      |Regenerate any `.pdf` figures from `.svg` figures in `fig`.|
 |`paper`                    |Build the paper.|
 |`docs`                     |Build all additional documents.|
 |`all`                      |Invoke all of the above.|
-|`diff REV1=HEAD^ REV2=HEAD`|To generate a diff of the paper between the specified revisions. If omitted, the `REV*` variables default to the mentioned values.|
+|`diff REV1=HEAD^ REV2=HEAD`|Generate a diff of the paper between the specified revisions. If omitted, the `REV*` variables default to the mentioned values.|
 |`blind`                    |Build an obfuscated version of the paper for double-blind review. The `blindreview` variable implicitly defined by this command can be used within the paper source to conditionally obfuscate content.|
-|`clean-paper`              |Deletes all artifacts of the `paper` and `diff` targets.|
-|`clean`                    |Deletes all artifacts.|
+|`clean-fig`                |Delete all artifacts of the `fig` target.|
+|`clean-paper`              |Delete all artifacts of the `paper` and `diff` targets.|
+|`clean`                    |Delete all artifacts.|
