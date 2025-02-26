@@ -5,16 +5,18 @@
 PAPER   ?= paper
 SRCDIR   = src
 BUILDDIR = build
+FIGDIR   = fig
 RESDIR   = res
 CLS      =
 BST      =
 DOCS     =
 GLOSSARY = $(SRCDIR)/glossary.tex
 BIBLIO   = $(SRCDIR)/$(PAPER).bib
+ARCHIVE  = $(BUILDDIR)/$(PAPER).tar.gz
 
 RESULTS =
 
-PAPER_FIGS          = $(patsubst %.svg,%.pdf,$(wildcard fig/*.svg))
+PAPER_FIGS          = $(patsubst %.svg,%.pdf,$(wildcard $(FIGDIR)/*.svg))
 PAPER_PREREQUISITES = $(PAPER_FIGS) $(CLS) $(BST) $(RESULTS) $(GLOSSARY) $(BIBLIO)
 
 # Diff configuration
@@ -77,7 +79,7 @@ endef
 # Rules #
 #########
 
-.PHONY: all fig paper docs diff results clean clean-fig clean-paper
+.PHONY: all fig paper docs diff results archive clean clean-fig clean-paper
 
 all: results paper docs
 
@@ -92,6 +94,8 @@ diff: $(DIFF_PDF)
 blind: $(BLIND_PAPER_PDF)
 
 results: $(RESULTS)
+
+arxiv: $(ARCHIVE)
 
 $(RESDIR):
 	mkdir -p $@
@@ -119,6 +123,11 @@ $(foreach doc,$(DOCS),$(eval $(call BUILD_LATEX_SIMPLE,$(doc))))
 # Convert vector graphics from SVG to PDF
 %.pdf: %.svg
 	inkscape $< --export-pdf=$@
+
+$(ARCHIVE): $(SRCDIR) $(RESDIR) $(PAPER_FIGS) $(BUILDDIR)/$(PAPER).bbl
+	tar --exclude='**/.gitignore' -czf $@ $(RESDIR) $(PAPER_FIGS) \
+		-C $(abspath $(SRCDIR)) $(shell ls $(SRCDIR)) \
+		-C $(abspath $(BUILDDIR)) $(PAPER).bbl
 
 clean-paper:
 	rm -rf $(BUILDDIR)
