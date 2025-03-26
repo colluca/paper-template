@@ -79,7 +79,7 @@ endef
 # Rules #
 #########
 
-.PHONY: all fig paper docs diff results archive clean clean-fig clean-paper
+.PHONY: all fig paper docs diff results arxiv clean clean-fig clean-paper
 
 all: results paper docs
 
