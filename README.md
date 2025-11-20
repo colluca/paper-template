@@ -36,6 +36,11 @@ If you have any additional Latex documents, e.g. cover letter and summary of cha
 
 Submitted papers can be saved in the `sub` directory.
 
+You can also create tagged releases:
+- In `Makefile`, set `RELEASENAME` to the basename you want to give your releases, e.g. `attention-nips`
+- Create a tag, e.g. `git tag v1`
+- Run `make release` or `make blind-release`, to build `attention-nips-v1.pdf` or `attention-nips-v1-BLIND.pdf`, respectively
+
 # Usage
 
 Once configured, the repository provides the following Make targets:
@@ -50,6 +55,8 @@ Once configured, the repository provides the following Make targets:
 |`diff REV1=HEAD^ REV2=HEAD`|Generate a diff of the paper between the specified revisions. If omitted, the `REV*` variables default to the mentioned values.|
 |`blind`                    |Build an obfuscated version of the paper for double-blind review. The `blindreview` variable implicitly defined by this command can be used within the paper source to conditionally obfuscate content.|
 |`arxiv`                    |Build an archive for submission to [arXiv](https://info.arxiv.org/help/submit_tex.html).|
+|`release`                  |Create a tagged release of the paper (make sure you are on a tagged git commit).|
+|`blind-release`            |Create a tagged release of the obfuscated paper for double-blind review (make sure you are on a tagged git commit). Obfuscated version is the same as built by `make blind`.|
 |`clean-fig`                |Delete all artifacts of the `fig` target.|
 |`clean-paper`              |Delete all artifacts of the `paper` and `diff` targets.|
 |`clean`                    |Delete all artifacts.|

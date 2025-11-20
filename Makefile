@@ -2,22 +2,24 @@
 # Configuration variables #
 ###########################
 
-PAPER   ?= paper
-SRCDIR   = src
-BUILDDIR = build
-FIGDIR   = fig
-RESDIR   = res
-CLS      =
-BST      =
-DOCS     =
-GLOSSARY = $(SRCDIR)/glossary.tex
-BIBLIO   = $(SRCDIR)/$(PAPER).bib
-ARCHIVE  = $(BUILDDIR)/$(PAPER).tar.gz
+PAPER      ?= paper
+SRCDIR      = src
+BUILDDIR    = build
+FIGDIR      = fig
+RESDIR      = res
+CLS         =
+BST         =
+DOCS        =
+GLOSSARY    = $(SRCDIR)/glossary.tex
+BIBLIO      = $(SRCDIR)/$(PAPER).bib
+ARCHIVE     = $(BUILDDIR)/$(PAPER).tar.gz
+RELEASENAME =
 
 RESULTS =
 
-PAPER_FIGS          = $(patsubst %.svg,%.pdf,$(wildcard $(FIGDIR)/*.svg))
-PAPER_PREREQUISITES = $(PAPER_FIGS) $(CLS) $(BST) $(RESULTS) $(GLOSSARY) $(BIBLIO)
+PAPER_FIGS           = $(patsubst %.svg,%.pdf,$(wildcard $(FIGDIR)/*.svg))
+PAPER_PREREQUISITES  = $(PAPER_FIGS) $(CLS) $(BST) $(RESULTS) $(GLOSSARY) $(BIBLIO)
+PAPER_PREREQUISITES += $(SRCDIR)/util.tex
 
 # Diff configuration
 REV1 ?= HEAD^
@@ -39,11 +41,17 @@ DOC_PDFS = $(addprefix $(BUILDDIR)/,$(addsuffix .pdf,$(DOCS)))
 DIFF     = $(PAPER)-diff$(REV1)-$(REV2)
 DIFF_PDF = $(BUILDDIR)/$(DIFF).pdf
 
-BIBTEX_VARS   = BIBINPUTS="$(SRCDIR):$(BUILDDIR):"
-PDFLATEX_VARS = TEXINPUTS="$(SRCDIR):$(BUILDDIR):"
+BIBTEX_VARS   = BIBINPUTS="$(TEMPLATE_DIR):$(SRCDIR):$(BUILDDIR):" BSTINPUTS="$(dir $(BST)):"
+PDFLATEX_VARS = TEXINPUTS="$(TEMPLATE_DIR):$(SRCDIR):$(BUILDDIR):$(RESDIR):"
 
 BIBTEX   = $(BIBTEX_VARS) bibtex
 PDFLATEX = $(PDFLATEX_VARS) pdflatex
+
+TAG = $(shell git describe --exact-match --tags 2>/dev/null)
+ifneq ($(strip $(TAG)),)
+RELEASE = $(BUILDDIR)/$(RELEASENAME)-$(TAG).pdf
+BLIND_RELEASE = $(BUILDDIR)/$(RELEASENAME)-$(TAG)-BLIND.pdf
+endif
 
 #############
 # Functions #
@@ -79,7 +87,7 @@ endef
 # Rules #
 #########
 
-.PHONY: all fig paper docs diff results arxiv clean clean-fig clean-paper
+.PHONY: all fig paper docs diff blind results arxiv release blind-release clean clean-fig clean-paper
 
 all: results paper docs
 
@@ -96,6 +104,10 @@ blind: $(BLIND_PAPER_PDF)
 results: $(RESULTS)
 
 arxiv: $(ARCHIVE)
+
+release: $(RELEASE)
+
+blind-release: $(BLIND_RELEASE)
 
 $(RESDIR):
 	mkdir -p $@
@@ -115,7 +127,7 @@ $(eval $(call BUILD_LATEX_COMPLEX,$(SRCDIR),$(PAPER),$(PAPER),$(PAPER_PREREQUISI
 $(eval $(call BUILD_LATEX_COMPLEX,$(BUILDDIR),$(DIFF),$(DIFF),$(PAPER_PREREQUISITES)))
 
 # Generate rule for blind paper
-$(eval $(call BUILD_LATEX_COMPLEX,$(SRCDIR),$(PAPER),$(PAPER)-blind,$(PAPER_PREREQUISITES),blindreview))
+$(eval $(call BUILD_LATEX_COMPLEX,$(SRCDIR),$(PAPER),$(PAPER)-blind,$(PAPER_PREREQUISITES)))
 
 # Generate rules for all docs
 $(foreach doc,$(DOCS),$(eval $(call BUILD_LATEX_SIMPLE,$(doc))))
@@ -128,6 +140,12 @@ $(ARCHIVE): $(SRCDIR) $(RESDIR) $(PAPER_FIGS) $(BUILDDIR)/$(PAPER).bbl
 	tar --exclude='**/.gitignore' -czf $@ $(RESDIR) $(PAPER_FIGS) \
 		-C $(abspath $(SRCDIR)) $(shell ls $(SRCDIR)) \
 		-C $(abspath $(BUILDDIR)) $(PAPER).bbl
+
+$(RELEASE): $(PAPER_PDF)
+	cp $(PAPER_PDF) $@
+
+$(BLIND_RELEASE): $(BLIND_PAPER_PDF)
+	cp $(BLIND_PAPER_PDF) $@
 
 clean-paper:
 	rm -rf $(BUILDDIR)

@@ -1,0 +1,14 @@
+% Define command to insert newlines
+\makeatletter
+\newcommand{\insertnewlines}[1]{%
+  \noindent\mbox{}%
+  \@tempcnta=#1\relax
+  \loop\ifnum\@tempcnta>0
+    \\
+    \advance\@tempcnta\m@ne
+  \repeat
+}
+\makeatother
+
+% Define command to insert variables in math mode
+\newcommand\variable[1]{\mathop{\mathit{#1}}\nolimits}
