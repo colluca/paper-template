@@ -127,7 +127,7 @@ $(eval $(call BUILD_LATEX_COMPLEX,$(SRCDIR),$(PAPER),$(PAPER),$(PAPER_PREREQUISI
 $(eval $(call BUILD_LATEX_COMPLEX,$(BUILDDIR),$(DIFF),$(DIFF),$(PAPER_PREREQUISITES)))
 
 # Generate rule for blind paper
-$(eval $(call BUILD_LATEX_COMPLEX,$(SRCDIR),$(PAPER),$(PAPER)-blind,$(PAPER_PREREQUISITES)))
+$(eval $(call BUILD_LATEX_COMPLEX,$(SRCDIR),$(PAPER),$(PAPER)-blind,$(PAPER_PREREQUISITES),blindreview))
 
 # Generate rules for all docs
 $(foreach doc,$(DOCS),$(eval $(call BUILD_LATEX_SIMPLE,$(doc))))
